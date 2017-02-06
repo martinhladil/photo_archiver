@@ -13,11 +13,12 @@ require_relative "verify"
 
 module PhotoArchiver
   class CLI < Thor
-    option :"dry-run", type: :boolean, aliases: "-d"
+    option :"archive-prefix", type: :string, aliases: "-a"
     option :backup, type: :boolean, aliases: "-b"
+    option :"dry-run", type: :boolean, aliases: "-d"
     desc "import", "Import files from import folder"
     def import
-      import = Import.new(options[:"dry-run"])
+      import = Import.new(options[:"archive-prefix"], options[:"dry-run"])
       archive_name = import.import
       if archive_name && !options[:"dry-run"] && options[:backup]
         backup = Backup.new(archive_name)

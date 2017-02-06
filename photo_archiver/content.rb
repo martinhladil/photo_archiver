@@ -18,7 +18,7 @@ module PhotoArchiver
     end
 
     def save_archive(archive_name)
-      yaml = @new_digests.to_yaml
+      yaml = @new_digests.sort.to_h.to_yaml
       archive_path = archive_name_to_content_path(archive_name)
       raise StandardError if File.exists?(archive_path)
       File.open(archive_path, "w") do |file|

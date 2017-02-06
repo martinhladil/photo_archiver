@@ -1,6 +1,7 @@
 module PhotoArchiver
   class Import
-    def initialize(dry_run = false)
+    def initialize(archive_prefix = nil, dry_run = false)
+      @archive_prefix = archive_prefix
       @dry_run = dry_run
     end
 
@@ -16,7 +17,7 @@ module PhotoArchiver
       archive_index = 0
       begin
         archive_index += 1
-        archive_name = Date.today.strftime("%Y-%m-%d") + "_%04d" % archive_index
+        archive_name = (@archive_prefix || Date.today.strftime("%Y-%m-%d")) + "_%04d" % archive_index
         archive_path = File.join(archive_root_path, archive_name)
       end while archive_names.include?(archive_name)
 
