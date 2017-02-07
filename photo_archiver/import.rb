@@ -27,7 +27,13 @@ module PhotoArchiver
       Find.find(import_path) do |path|
         next if File.directory?(path) || File.basename(path).start_with?(".")
         print "."
-        exif = MiniExiftool.new(path)
+        begin
+          exif = MiniExiftool.new(path)
+        rescue MiniExiftool::Error
+          puts
+          puts " - #{Paint["Unsupported file:", :red]} #{path[import_path.size + 1..-1]}"
+          next
+        end
         time = exif.create_date || exif.file_modify_date
 
         digest = Digest::SHA1.file(path).hexdigest
@@ -53,8 +59,8 @@ module PhotoArchiver
       if imported.any?
         puts
         FileUtils.mkdir(archive_path) unless @dry_run
-        imported.each do |source_path, destination_name|
-          puts [" - Moving file:", Paint[destination_name, :cyan], Paint["[EXIF]", :green]].compact.join(" ")
+        imported.each do |source_path, destination_name, exif|
+          puts [" - Moving file:", Paint[destination_name, :cyan], (Paint["[EXIF]", :green] if exif)].compact.join(" ")
           FileUtils.mv(source_path, File.join(archive_path, destination_name)) unless @dry_run
         end
         content.save_archive(archive_name) unless @dry_run
