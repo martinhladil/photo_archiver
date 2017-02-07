@@ -6,7 +6,7 @@ module PhotoArchiver
       @archive_name = archive_name
     end
 
-    def verify(summary = true)
+    def verify(skip_digest = false, summary = true)
       archive_root_path = File.expand_path(Config[:archive_path])
       content_path = File.expand_path(Config[:content_path])
 
@@ -28,7 +28,7 @@ module PhotoArchiver
       content.names.each do |content_digest, content_name|
         name = names.delete(content_name[:name])
         if name
-          if content_digest == Digest::SHA1.file(File.join(archive_path, name)).hexdigest
+          if skip_digest || (content_digest == Digest::SHA1.file(File.join(archive_path, name)).hexdigest)
             counts[:verified] += 1
           else
             counts[:corrupted] += 1
@@ -47,7 +47,7 @@ module PhotoArchiver
       counts
     end
 
-    def self.verify_all
+    def self.verify_all(skip_digest = false)
       archive_root_path = File.expand_path(Config[:archive_path])
       content_path = File.expand_path(Config[:content_path])
       counts = {}
@@ -63,7 +63,7 @@ module PhotoArchiver
       end
       archives.each do |archive_name|
         verify = Verify.new(archive_name)
-        archive_counts = verify.verify(false)
+        archive_counts = verify.verify(skip_digest, false)
         archive_counts.each_pair do |key, value|
           counts[key] ||= 0
           counts[key] += value

@@ -32,13 +32,14 @@ module PhotoArchiver
       backup.backup
     end
 
+    option :"skip-digest", type: :boolean, aliases: "-s"
     desc "verify [ARCHIVE]", "Verify archive"
     def verify(archive = nil)
       if archive
         verify = Verify.new(archive)
-        verify.verify
+        verify.verify(options[:"skip-digest"])
       else
-        Verify.verify_all
+        Verify.verify_all(options[:"skip-digest"])
       end
     end
 
