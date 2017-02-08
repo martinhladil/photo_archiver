@@ -46,7 +46,7 @@ module PhotoArchiver
     end
 
     def archives
-      Dir.glob(File.join(@content_root_path, "*.yml")).map{ |path| File.basename(path, ".*") }
+      Dir.glob(File.join(@content_root_path, "*.yml")).map{ |path| File.basename(path, ".*") }.sort
     end
 
     protected
